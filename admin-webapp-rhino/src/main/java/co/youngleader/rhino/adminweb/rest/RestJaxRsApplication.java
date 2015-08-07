@@ -4,7 +4,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import co.youngleader.rhino.adminweb.rest.resources.MyDemoResource;
+import co.youngleader.rhino.adminweb.rest.resource.MyDemoResource;
 
 public class RestJaxRsApplication extends ResourceConfig {
 

@@ -1,18 +1,74 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:tx="http://www.springframework.org/schema/tx"	
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans	
-		http://www.springframework.org/schema/beans/spring-beans.xsd
-	 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	
+		http://www.springframework.org/schema/beans/spring-beans.xsd	 
 		http://www.springframework.org/schema/tx 
-		http://www.springframework.org/schema/tx/spring-tx.xsd
-		 
+		http://www.springframework.org/schema/tx/spring-tx.xsd		 
 		http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context.xsd">
- 
+
+
+	<context:property-placeholder location="classpath:spring/ds.properties" />
+
 	<context:component-scan base-package="co.youngleader.rhino.adminweb.rest.*" />
+
+
+	<bean id="restDemoDS" class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close">
+		<!-- 数据库基本信息配置 -->
+		<property name="url" value="${mysql.url}" />
+		<property name="driverClassName" value="${mysql.driver}" />
+		<property name="username" value="${mysql.username}" />
+		<property name="password" value="${mysql.password}" />
+
+		<property name="maxIdle" value="${dbcp2.maxIdle}" />
+		<property name="minIdle" value="${dbcp2.minIdle}" />
+		<property name="initialSize" value="${dbcp2.initialSize}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${dbcp2.timeBetweenEvictionRunsMillis}" />
+
+		<property name="poolPreparedStatements" value="${dbcp2.poolPreparedStatements}" />
+		<property name="maxOpenPreparedStatements" value="${dbcp2.maxOpenPreparedStatements}" />
+		<property name="removeAbandonedTimeout" value="${dbcp2.removeAbandonedTimeout}" />
+
+		<!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+		<property name="testOnBorrow" value="${dbcp2.testOnBorrow}" />
+
+		<!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+		<property name="testOnReturn" value="${dbcp2.testOnReturn}" />
+
+		<!-- 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于 timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。 -->
+		<property name="testWhileIdle" value="${dbcp2.testWhileIdle}" />
+
+		<!-- 用来检测连接是否有效的sql，要求是一个查询语句,如果validationQuery为 null，testOnBorrow、testOnReturn、testWhileIdle都不起其作用。 -->
+		<property name="validationQuery" value="${dbcp2.validationQuery}" />
+
+	</bean>
+
+	<!-- ************ JPA configuration *********** -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:config/persistence-demo.xml" />
+		<property name="persistenceUnitName" value="demoRestPersistence" />
+		<property name="dataSource" ref="restDemoDS" />
+		<property name="packagesToScan" value="org.codingpedia.demo.*" />
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="showSql" value="true" />
+				<property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="podcastDao" class="co.youngleader.rhino.adminweb.rest.dao.PodcastDaoJPA2Impl"/>	
+    <bean id="podcastService" class="co.youngleader.rhino.adminweb.rest.service.PodcastServiceDbAccessImpl" />	
+    <bean id="podcastsResource" class="co.youngleader.rhino.adminweb.rest.resource.podcast.PodcastsResource" />
+
 
 </beans>

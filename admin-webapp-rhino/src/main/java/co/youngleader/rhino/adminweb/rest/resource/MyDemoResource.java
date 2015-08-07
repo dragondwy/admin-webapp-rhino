@@ -1,4 +1,4 @@
-package co.youngleader.rhino.adminweb.rest.resources;
+package co.youngleader.rhino.adminweb.rest.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
